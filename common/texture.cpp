@@ -14,9 +14,7 @@ void fread_N_check_rc(void * ptr, size_t size, size_t nitems, FILE * stream) {
 
 	rc_num_bytes_read = fread( ptr, size, nitems, stream);
 
-	// std::cout << "Here is value of rc_num_bytes_read " << rc_num_bytes_read << std::endl;
-
-	if (0 >= rc_num_bytes_read) {
+	if (0 > rc_num_bytes_read) {
 
 		std::cerr << "ERROR - failed to read wav file header" << std::endl;
 		exit(EXIT_FAILURE);		

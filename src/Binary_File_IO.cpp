@@ -22,17 +22,11 @@
                         // http://stackoverflow.com/questions/1623769/is-there-any-safe-strcmp
 #include <sstream>
 
-
-
-// void Binary_File_IO::fread_N_check_rc(void *restrict ptr, size_t size, size_t nitems, FILE *restrict stream) {
 void Binary_File_IO::fread_N_check_rc(void * ptr, size_t size, size_t nitems, FILE * stream) {
-
+	
 	size_t rc_num_bytes_read;
 
-	// rc_num_bytes_read = fread( & wavHeader, sizeof(wave_header), 1, file_hd);
 	rc_num_bytes_read = fread( ptr, size, nitems, stream);
-
-	// std::cout << "Here is value of rc_num_bytes_read " << rc_num_bytes_read << std::endl;
 
 	if (0 > rc_num_bytes_read) {
 
@@ -40,7 +34,6 @@ void Binary_File_IO::fread_N_check_rc(void * ptr, size_t size, size_t nitems, FI
 		exit(EXIT_FAILURE);		
 	}
 }
-
 
 
 void Binary_File_IO::parse_wav_header_adaptive(unsigned int * samp_rate, unsigned int * bits_per_samp,
