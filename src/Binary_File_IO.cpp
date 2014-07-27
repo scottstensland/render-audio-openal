@@ -17,12 +17,31 @@
 #include "Binary_File_IO.h"
 
 #include <iostream>	// std::cout
-
 #include <stdlib.h>	// exit
-
 #include <string.h>		// remove when I cut over to strncmp
                         // http://stackoverflow.com/questions/1623769/is-there-any-safe-strcmp
 #include <sstream>
+
+
+
+// void Binary_File_IO::fread_N_check_rc(void *restrict ptr, size_t size, size_t nitems, FILE *restrict stream) {
+void Binary_File_IO::fread_N_check_rc(void * ptr, size_t size, size_t nitems, FILE * stream) {
+
+	size_t rc_num_bytes_read;
+
+	// rc_num_bytes_read = fread( & wavHeader, sizeof(wave_header), 1, file_hd);
+	rc_num_bytes_read = fread( ptr, size, nitems, stream);
+
+	// std::cout << "Here is value of rc_num_bytes_read " << rc_num_bytes_read << std::endl;
+
+	if (0 > rc_num_bytes_read) {
+
+		std::cerr << "ERROR - failed to read wav file header" << std::endl;
+		exit(EXIT_FAILURE);		
+	}
+}
+
+
 
 void Binary_File_IO::parse_wav_header_adaptive(unsigned int * samp_rate, unsigned int * bits_per_samp,
 		unsigned int * buffer_size, unsigned short * num_channels) {
@@ -54,7 +73,19 @@ void Binary_File_IO::parse_wav_header_adaptive(unsigned int * samp_rate, unsigne
 
 	wave_header wavHeader;
 
-	fread( & wavHeader, sizeof(wave_header), 1, file_hd);
+	/*
+	size_t rc_num_bytes_read;
+
+	rc_num_bytes_read = fread( & wavHeader, sizeof(wave_header), 1, file_hd);
+
+	if (0 <= rc_num_bytes_read) {
+
+		std::cerr << "ERROR - faile to read wav file header");
+		exit(EXIT_FAILURE);		
+	}
+	*/
+
+	fread_N_check_rc(& wavHeader, sizeof(wave_header), 1, file_hd);
 
 	std::cout << "  chunk_id : " << wavHeader.chunk_id[0] << wavHeader.chunk_id[1] << wavHeader.chunk_id[2] << wavHeader.chunk_id[3] << std::endl;
 	std::cout << "chunk_size : " << wavHeader.chunk_size << std::endl;
@@ -64,7 +95,8 @@ void Binary_File_IO::parse_wav_header_adaptive(unsigned int * samp_rate, unsigne
 
 	riff_chunk_header chunkHeader;
 
-	fread( & chunkHeader, sizeof(riff_chunk_header), 1, file_hd);
+	// fread( & chunkHeader, sizeof(riff_chunk_header), 1, file_hd);
+	fread_N_check_rc( & chunkHeader, sizeof(riff_chunk_header), 1, file_hd);
 
 //	std::cout << "chunkHeader ID " << chunkHeader.id << std::endl;
 
@@ -97,7 +129,7 @@ void Binary_File_IO::parse_wav_header_adaptive(unsigned int * samp_rate, unsigne
 
 	wave_fmt_chunk fmtChunk;
 
-	fread( & fmtChunk, sizeof(wave_fmt_chunk), 1, file_hd);
+	fread_N_check_rc( & fmtChunk, sizeof(wave_fmt_chunk), 1, file_hd);
 
 	if (1 == fmtChunk.audio_format) {
 
@@ -142,7 +174,7 @@ void Binary_File_IO::parse_wav_header_adaptive(unsigned int * samp_rate, unsigne
 
 		wave_final_chunk_extended chunkExtended;
 
-		fread( & chunkExtended, sizeof(wave_final_chunk_extended), 1, file_hd);
+		fread_N_check_rc( & chunkExtended, sizeof(wave_final_chunk_extended), 1, file_hd);
 
 		std::cout << "seeing PCM with fmt and size 18 ..." << std::endl;
 
@@ -184,7 +216,7 @@ void Binary_File_IO::parse_wav_header_adaptive(unsigned int * samp_rate, unsigne
 
 		wave_final_chunk chunkFinal;
 
-		fread( & chunkFinal, sizeof(wave_final_chunk), 1, file_hd);
+		fread_N_check_rc( & chunkFinal, sizeof(wave_final_chunk), 1, file_hd);
 
 		std::cout << "subchunk2ID : "
 				<< chunkFinal.subchunk2ID[0]
@@ -288,7 +320,7 @@ void Binary_File_IO::parse_wav_header(unsigned int * samp_rate, unsigned int * b
 
 	std::cout << "cccc sizeof(wav_header) == " << sizeof(wav_header) << std::endl;
 
-	fread( & wavHeader, sizeof(wav_header), 1, file_hd);  // both of these work == size * number of
+	fread_N_check_rc( & wavHeader, sizeof(wav_header), 1, file_hd);  // both of these work == size * number of
 
 
 	* samp_rate     = wavHeader.sampleRate;
@@ -323,7 +355,7 @@ void Binary_File_IO::read_wav_header(unsigned int * samp_rate, unsigned int * bi
 	unsigned char buf[5];
 
 	/* ChunkID (RIFF for little-endian (lo/hi), RIFX for big-endian hi/lo) */
-	fread(buf, 1, 4, file_hd);
+	fread_N_check_rc(buf, 1, 4, file_hd);
 	buf[4] = '\0';
 
 //    $0000-0003: Chunk ID  "RIFF"  in  ASCII  ("RIFX"  files  identify  the
@@ -354,7 +386,7 @@ void Binary_File_IO::read_wav_header(unsigned int * samp_rate, unsigned int * bi
 //               overall size)
 
 	/* ChunkSize */
-	fread(buf, 1, 4, file_hd);
+	fread_N_check_rc(buf, 1, 4, file_hd);
 
 	ChunkSize = buf[0] + (buf[1] << 8) + (buf[2] << 16) + (buf[3] << 24);
 
@@ -366,7 +398,7 @@ void Binary_File_IO::read_wav_header(unsigned int * samp_rate, unsigned int * bi
 //               exist, "fmt " and "data".
 
 	/* Format */
-	fread(buf, 1, 4, file_hd);
+	fread_N_check_rc(buf, 1, 4, file_hd);
 	buf[4] = '\0';
 	if (strcmp((char*) buf, "WAVE")) {
 
@@ -384,7 +416,7 @@ void Binary_File_IO::read_wav_header(unsigned int * samp_rate, unsigned int * bi
 //               DATA subchunk.
 
 	/* Subchunk1ID */
-	fread(buf, 1, 4, file_hd);
+	fread_N_check_rc(buf, 1, 4, file_hd);
 	buf[4] = '\0';
 	if (strcmp((char*) buf, "fmt ")) {
 
@@ -404,7 +436,7 @@ void Binary_File_IO::read_wav_header(unsigned int * samp_rate, unsigned int * bi
 //	16 for PCM.  This is the size of the rest of the Subchunk which follows this number.
 
 	/* Subchunk1Size (16 for PCM) */
-	fread(buf, 1, 4, file_hd);
+	fread_N_check_rc(buf, 1, 4, file_hd);
 	buf[4] = '\0';
 
 	if (buf[0] != 16 || buf[1] || buf[2] || buf[3]) {
@@ -439,7 +471,7 @@ void Binary_File_IO::read_wav_header(unsigned int * samp_rate, unsigned int * bi
 //               - $0103 = IBM AVC ADPCM (custom)
 
 	/* AudioFormat (PCM = 1, other values indicate compression) */
-	fread(buf, 1, 2, file_hd);
+	fread_N_check_rc(buf, 1, 2, file_hd);
 	if (buf[0] != 1 || buf[1]) {
 
 		std::cout << "RBA ERROR did NOT see AudioFormat ... instead saw -->" << buf << "<--"
@@ -459,7 +491,7 @@ void Binary_File_IO::read_wav_header(unsigned int * samp_rate, unsigned int * bi
 //    0016-0017: Number of channels (1=mono, 2=stereo, etc) ($0002)
 
 	/* NumChannels (Mono = 1, Stereo = 2, etc) */
-	fread(buf, 1, 2, file_hd);
+	fread_N_check_rc(buf, 1, 2, file_hd);
 	unsigned int num_ch = buf[0] + (buf[1] << 8);
 	if (num_ch != 1) {
 
@@ -479,7 +511,7 @@ void Binary_File_IO::read_wav_header(unsigned int * samp_rate, unsigned int * bi
 //    0018-001B: Sample rate per second (lo/hi) $0000AC44 = 44100
 
 	/* SampleRate (8000, 44100, etc) */
-	fread(buf, 1, 4, file_hd);
+	fread_N_check_rc(buf, 1, 4, file_hd);
 	*samp_rate = buf[0] + (buf[1] << 8) + (buf[2] << 16) + (buf[3] << 24);
 
 	printf("BinaryIO file parser sample rate %d\n", * samp_rate);
@@ -490,7 +522,7 @@ void Binary_File_IO::read_wav_header(unsigned int * samp_rate, unsigned int * bi
 //               (bits per channel/8)) $0002B110 = 176400
 
 	/* ByteRate (SampleRate * NumChannels * BitsPerSample / 8) */
-	fread(buf, 1, 4, file_hd);
+	fread_N_check_rc(buf, 1, 4, file_hd);
 	const unsigned int byte_rate = buf[0] + (buf[1] << 8) + (buf[2] << 16)
 			+ (buf[3] << 24);
 
@@ -500,7 +532,7 @@ void Binary_File_IO::read_wav_header(unsigned int * samp_rate, unsigned int * bi
 //               ($0004).
 
 	/* BlockAlign (NumChannels * BitsPerSample / 8) */
-	fread(buf, 1, 2, file_hd);
+	fread_N_check_rc(buf, 1, 2, file_hd);
 	const unsigned int block_align = buf[0] + (buf[1] << 8);
 
 	// ------------------------------------------------- //
@@ -510,7 +542,7 @@ void Binary_File_IO::read_wav_header(unsigned int * samp_rate, unsigned int * bi
 //               unused bits off.
 
 	/* BitsPerSample */
-	fread(buf, 1, 2, file_hd);
+	fread_N_check_rc(buf, 1, 2, file_hd);
 	*bits_per_samp = buf[0] + (buf[1] << 8);
 
 	if (byte_rate != ((*samp_rate * num_ch * *bits_per_samp) >> 3)) {
@@ -532,7 +564,7 @@ void Binary_File_IO::read_wav_header(unsigned int * samp_rate, unsigned int * bi
 //               samples. There can be more than one in a WAV file.
 
 	/* Subchunk2ID */
-	fread(buf, 1, 4, file_hd);
+	fread_N_check_rc(buf, 1, 4, file_hd);
 	buf[4] = '\0';
 	if (strcmp((char*) buf, "data")) {
 
@@ -547,7 +579,7 @@ void Binary_File_IO::read_wav_header(unsigned int * samp_rate, unsigned int * bi
 //    0028-002B: Subchunk2 size (lo/hi) ($01CC45B0=30,164,400)
 
 	/* Subchunk2Size (NumSamples * NumChannels * BitsPerSample / 8) */
-	fread(buf, 1, 4, file_hd);
+	fread_N_check_rc(buf, 1, 4, file_hd);
 	const unsigned int subchunk2_size = buf[0] + (buf[1] << 8) + (buf[2] << 16)
 			+ (buf[3] << 24);
 
@@ -591,7 +623,7 @@ void Binary_File_IO::read_wav_data(short int * buff_data, unsigned int samp_rate
 	for (i = 0; i < source_buffer_size; ++i) {
 		unsigned int tmp = 0;
 		for (j = 0; j != bits_per_samp; j += 8) {
-			fread(&buf, 1, 1, file_hd);
+			fread_N_check_rc(&buf, 1, 1, file_hd);
 			tmp += buf << j;
 		}
 		buff_data[i] = conv_bit_size(tmp, bits_per_samp);

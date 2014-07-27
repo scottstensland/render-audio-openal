@@ -63,7 +63,7 @@ private:
 //	int conv_bit_size(unsigned int in, int bps); // converts unsigned into signed
 	short int conv_bit_size(unsigned int in, int bps); // converts unsigned into signed
 
-
+	void fread_N_check_rc(void * ptr, size_t size, size_t nitems, FILE * stream);
 
 };
 

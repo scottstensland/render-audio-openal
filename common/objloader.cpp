@@ -9,7 +9,6 @@
 
 #include "objloader.hpp"
 
-
 bool loadOBJ(
 	const char * path, 
 	std::vector<glm::vec3> & out_vertices, 
@@ -42,16 +41,25 @@ bool loadOBJ(
 		
 		if ( strcmp( lineHeader, "v" ) == 0 ){
 			glm::vec3 vertex;
-			fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z );
+			res = fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z );
+			if (res == EOF)
+				break; // EOF = End Of File. Quit the loop.
+
 			temp_vertices.push_back(vertex);
 		}else if ( strcmp( lineHeader, "vt" ) == 0 ){
 			glm::vec2 uv;
-			fscanf(file, "%f %f\n", &uv.x, &uv.y );
+			res = fscanf(file, "%f %f\n", &uv.x, &uv.y );
+			if (res == EOF)
+				break; // EOF = End Of File. Quit the loop.
+
 			uv.y = -uv.y; // Invert V coordinate since we will only use DDS texture, which are inverted. Remove if you want to use TGA or BMP loaders.
 			temp_uvs.push_back(uv);
 		}else if ( strcmp( lineHeader, "vn" ) == 0 ){
 			glm::vec3 normal;
-			fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z );
+			res = fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z );
+			if (res == EOF)
+				break; // EOF = End Of File. Quit the loop.
+
 			temp_normals.push_back(normal);
 		}else if ( strcmp( lineHeader, "f" ) == 0 ){
 			std::string vertex1, vertex2, vertex3;
@@ -73,7 +81,7 @@ bool loadOBJ(
 		}else{
 			// Probably a comment, eat up the rest of the line
 			char stupidBuffer[1000];
-			fgets(stupidBuffer, 1000, file);
+			if (fgets(stupidBuffer, 1000, file)) {}; // NOP
 		}
 
 	}

@@ -6,6 +6,23 @@
 
 #include <GL/glfw.h>
 
+#include <iostream>
+
+void fread_N_check_rc(void * ptr, size_t size, size_t nitems, FILE * stream) {
+
+	size_t rc_num_bytes_read;
+
+	rc_num_bytes_read = fread( ptr, size, nitems, stream);
+
+	// std::cout << "Here is value of rc_num_bytes_read " << rc_num_bytes_read << std::endl;
+
+	if (0 >= rc_num_bytes_read) {
+
+		std::cerr << "ERROR - failed to read wav file header" << std::endl;
+		exit(EXIT_FAILURE);		
+	}
+}
+
 
 GLuint loadBMP_custom(const char * imagepath){
 
@@ -36,14 +53,21 @@ GLuint loadBMP_custom(const char * imagepath){
 		return 0;
 	}
 	// Make sure this is a 24bpp file
-	if ( *(int*)&(header[0x1E])!=0  )         {printf("Not a correct BMP file\n");    return 0;}
-	if ( *(int*)&(header[0x1C])!=24 )         {printf("Not a correct BMP file\n");    return 0;}
+	// if ( *(int*)&(header[0x1E])!=0  )         {printf("Not a correct BMP file\n");    return 0;}
+	if ( *(char *)&(header[0x1E])!=0  )         {printf("Not a correct BMP file\n");    return 0;}
+	// if ( *(int*)&(header[0x1C])!=24 )         {printf("Not a correct BMP file\n");    return 0;}
+	if ( *(char *)&(header[0x1C])!=24 )         {printf("Not a correct BMP file\n");    return 0;}
 
 	// Read the information about the image
-	dataPos    = *(int*)&(header[0x0A]);
-	imageSize  = *(int*)&(header[0x22]);
-	width      = *(int*)&(header[0x12]);
-	height     = *(int*)&(header[0x16]);
+	// dataPos    = *(int*)&(header[0x0A]);
+	// imageSize  = *(int*)&(header[0x22]);
+	// width      = *(int*)&(header[0x12]);
+	// height     = *(int*)&(header[0x16]);
+
+	dataPos    = *(char *)&(header[0x0A]);
+	imageSize  = *(char *)&(header[0x22]);
+	width      = *(char *)&(header[0x12]);
+	height     = *(char *)&(header[0x16]);
 
 	// Some BMP files are misformatted, guess missing information
 	if (imageSize==0)    imageSize=width*height*3; // 3 : one byte for each Red, Green and Blue component
@@ -53,7 +77,7 @@ GLuint loadBMP_custom(const char * imagepath){
 	data = new unsigned char [imageSize];
 
 	// Read the actual data from the file into the buffer
-	fread(data,1,imageSize,file);
+	fread_N_check_rc(data,1,imageSize,file);
 
 	// Everything is in memory now, the file wan be closed
 	fclose (file);
@@ -128,20 +152,28 @@ GLuint loadDDS(const char * imagepath){
    
 	/* verify the type of file */ 
 	char filecode[4]; 
-	fread(filecode, 1, 4, fp); 
+	fread_N_check_rc(filecode, 1, 4, fp); 
 	if (strncmp(filecode, "DDS ", 4) != 0) { 
 		fclose(fp); 
 		return 0; 
 	}
 	
 	/* get the surface desc */ 
-	fread(&header, 124, 1, fp); 
+	fread_N_check_rc(&header, 124, 1, fp); 
 
-	unsigned int height      = *(unsigned int*)&(header[8 ]);
-	unsigned int width	     = *(unsigned int*)&(header[12]);
-	unsigned int linearSize	 = *(unsigned int*)&(header[16]);
-	unsigned int mipMapCount = *(unsigned int*)&(header[24]);
-	unsigned int fourCC      = *(unsigned int*)&(header[80]);
+	// unsigned int height      = *(unsigned int*)&(header[8 ]);
+	// unsigned int width	     = *(unsigned int*)&(header[12]);
+	// unsigned int linearSize	 = *(unsigned int*)&(header[16]);
+	// unsigned int mipMapCount = *(unsigned int*)&(header[24]);
+	// unsigned int fourCC      = *(unsigned int*)&(header[80]);
+
+
+	unsigned int height      = *(unsigned char *)&(header[8 ]);
+	unsigned int width	     = *(unsigned char*)&(header[12]);
+	unsigned int linearSize	 = *(unsigned char*)&(header[16]);
+	unsigned int mipMapCount = *(unsigned char*)&(header[24]);
+	unsigned int fourCC      = *(unsigned char*)&(header[80]);
+
 
  
 	unsigned char * buffer;
@@ -149,7 +181,7 @@ GLuint loadDDS(const char * imagepath){
 	/* how big is it going to be including all mipmaps? */ 
 	bufsize = mipMapCount > 1 ? linearSize * 2 : linearSize; 
 	buffer = (unsigned char*)malloc(bufsize * sizeof(unsigned char)); 
-	fread(buffer, 1, bufsize, fp); 
+	fread_N_check_rc(buffer, 1, bufsize, fp); 
 	/* close the file pointer */ 
 	fclose(fp);
 
