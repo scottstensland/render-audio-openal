@@ -23,7 +23,7 @@
 #include <sstream>
 
 void Binary_File_IO::fread_N_check_rc(void * ptr, size_t size, size_t nitems, FILE * stream) {
-	
+
 	size_t rc_num_bytes_read;
 
 	rc_num_bytes_read = fread( ptr, size, nitems, stream);
@@ -66,18 +66,6 @@ void Binary_File_IO::parse_wav_header_adaptive(unsigned int * samp_rate, unsigne
 
 	wave_header wavHeader;
 
-	/*
-	size_t rc_num_bytes_read;
-
-	rc_num_bytes_read = fread( & wavHeader, sizeof(wave_header), 1, file_hd);
-
-	if (0 <= rc_num_bytes_read) {
-
-		std::cerr << "ERROR - faile to read wav file header");
-		exit(EXIT_FAILURE);		
-	}
-	*/
-
 	fread_N_check_rc(& wavHeader, sizeof(wave_header), 1, file_hd);
 
 	std::cout << "  chunk_id : " << wavHeader.chunk_id[0] << wavHeader.chunk_id[1] << wavHeader.chunk_id[2] << wavHeader.chunk_id[3] << std::endl;
@@ -88,10 +76,7 @@ void Binary_File_IO::parse_wav_header_adaptive(unsigned int * samp_rate, unsigne
 
 	riff_chunk_header chunkHeader;
 
-	// fread( & chunkHeader, sizeof(riff_chunk_header), 1, file_hd);
 	fread_N_check_rc( & chunkHeader, sizeof(riff_chunk_header), 1, file_hd);
-
-//	std::cout << "chunkHeader ID " << chunkHeader.id << std::endl;
 
 	// ---
 
@@ -239,49 +224,6 @@ void Binary_File_IO::parse_wav_header_adaptive(unsigned int * samp_rate, unsigne
 void Binary_File_IO::parse_wav_header(unsigned int * samp_rate, unsigned int * bits_per_samp,
 		unsigned int * buffer_size) {
 
-//	typedef struct wavHeader {
-//										// offset     size    notes
-//	    unsigned char  chunckID[4];		//   0			4
-//	    unsigned int   chunckSize;		//   4			4
-//	    unsigned char  format[4];		//   8			4
-//	    unsigned char  subchunk1ID[4];	//  12			4
-//	    unsigned int   subchunk1Size;	//  16			4
-//	    unsigned short audioFormat;		//  20			2
-//	    unsigned short numChannels;		//  22			2
-//	    unsigned int   sampleRate;		//  24			4
-//	    unsigned int   byteRate;		//  28			4
-//	    unsigned short blockAlign;		//  32			2     NumChannels * BitsPerSample/8
-//	    unsigned short bitsPerSample;	//  34			2     8 bits = 8, 16 bits = 16, etc.
-//	    unsigned char  subchunk2ID[4];	//  36			4     Contains the letters "data"  (0x64617461 big-endian form)
-//	    unsigned int   subchunk2Size;	//  40			4     NumSamples * NumChannels * BitsPerSample/8
-//	    								//					  This is the number of bytes in the data
-//	} wav_header;
-
-/*
-	typedef struct wavHeader {
-										// offset     size    notes
-	    char  chunckID[4];		//   0			4
-	    int   chunckSize;		//   4			4
-	    char  format[4];		//   8			4
-	    char  subchunk1ID[4];	//  12			4
-	    int   subchunk1Size;	//  16			4
-	    short audioFormat;		//  20			2
-	    short numChannels;		//  22			2
-	    int   sampleRate;		//  24			4
-	    int   byteRate;		//  28			4
-	    short blockAlign;		//  32			2     NumChannels * BitsPerSample/8
-	    short bitsPerSample;	//  34			2     8 bits = 8, 16 bits = 16, etc.
-	    char  subchunk2ID[4];	//  36			4     Contains the letters "data"  (0x64617461 big-endian form)
-	    int   subchunk2Size;	//  40			4     NumSamples * NumChannels * BitsPerSample/8
-	    						//					  This is the number of bytes in the data
-	} wav_header;
-
-	wav_header wavHeader;
-
-*/
-
-
-
 	typedef struct wavHeader {
 										// offset     size    notes
 	    char  chunckID[4];		//   0			4
@@ -303,13 +245,6 @@ void Binary_File_IO::parse_wav_header(unsigned int * samp_rate, unsigned int * b
 	} wav_header;
 
 	wav_header wavHeader;
-
-
-
-//	std::cout << "cccc sizeof(wav_header) == " << sizeof(wav_header) << std::endl;
-
-//	fread( & wavHeader, sizeof(wav_header), 1, file_hd);  // both of these work == size * number of
-//	fread( & wavHeader, 1, sizeof(wav_header), file_hd);  // both of these work
 
 	std::cout << "cccc sizeof(wav_header) == " << sizeof(wav_header) << std::endl;
 

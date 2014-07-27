@@ -304,14 +304,3 @@ int main() {
 
 	return 0;
 }
-
-/*
-cpp_openal_opengl_dna::cpp_openal_opengl_dna() {
-
-}
-
-cpp_openal_opengl_dna::~cpp_openal_opengl_dna() {
-
-}
-*/
-
