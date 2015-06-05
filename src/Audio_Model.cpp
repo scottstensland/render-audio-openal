@@ -218,7 +218,7 @@ void Audio_Model::update_location_molecules(int count_num_molecular_update_chron
 
 	} else {
 
-		std::cout << "Already did show for aac_index " << aac_index << std::endl;
+		// std::cout << "Already did show for aac_index " << aac_index << std::endl;
 		return;
 	}
 
