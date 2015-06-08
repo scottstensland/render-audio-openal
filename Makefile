@@ -18,7 +18,7 @@
 CC = g++
 
 # define any compile-time flags
-CFLAGS = -Wall -g -std=c++11 -O3
+CFLAGS =  -Wall -g -std=c++11 -O3
 
 # define any directories containing header files other than /usr/include
 #
@@ -32,7 +32,7 @@ CFLAGS = -Wall -g -std=c++11 -O3
 # define any libraries to link into executable:
 #   if I want to link in libraries (libx.so or libx.a) I use the -llibname 
 #   option, something like (this will link in libmylib.so and libm.so:
-LIBS = -lGL -lGLU -lopenal -lGLEW -lm -lglfw
+LIBS = -lGL -lGLU -lopenal -lGLEW -lm -lglfw -lpthread
 
 # define the C source files
 SRCS = src/*.cpp common/*.cpp
