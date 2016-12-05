@@ -9,6 +9,7 @@ To compile on linux :
 	make
 
 
+```
 Prerequisites :
 
 sudo apt-get install libopenal-dev
@@ -17,6 +18,7 @@ sudo apt-get install libglfw-dev
 sudo apt-get install libglew-dev
 sudo apt-get install freeglut3-dev
 
+```
 
 
 
