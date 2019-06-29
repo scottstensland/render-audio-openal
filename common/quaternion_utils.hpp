@@ -1,5 +1,9 @@
+
+#define GLM_ENABLE_EXPERIMENTAL
+
 #ifndef QUATERNION_UTILS_H
 #define QUATERNION_UTILS_H
+
 
 quat RotationBetweenVectors(vec3 start, vec3 dest);
 
@@ -9,3 +13,4 @@ quat RotateTowards(quat q1, quat q2, float maxAngle);
 
 
 #endif // QUATERNION_UTILS_H
+

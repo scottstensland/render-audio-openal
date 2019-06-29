@@ -1,12 +1,4 @@
 
-# g++ -D__GXX_EXPERIMENTAL_CXX0X__ -O0 -g3 -Wall -c -fmessage-length=0 -std=c++0x -MMD -MP -MF"src/cpp_openal_opengl_dna.d" -MT"src/cpp_openal_opengl_dna.d" -o "src/cpp_openal_opengl_dna.o" "../src/cpp_openal_opengl_dna.cpp"
-
-
-
-
-# g++  -o "bin/cpp_play_01"  ./src/Audio_Controller.o ./src/Audio_Model.o ./src/Audio_Utility.o ./src/Audio_View.o ./src/Binary_File_IO.o ./src/Circular_Buffer.o ./src/Common_Utilities.o ./src/Consumer.o ./src/Producer.o ./src/Stream_Render_Audio.o ./src/Synthesize_Sound.o ./src/cpp_openal_opengl_dna.o  ./common/controls.o ./common/objloader.o ./common/quaternion_utils.o ./common/shader.o ./common/tangentspace.o ./common/text2D.o ./common/texture.o ./common/vboindexer.o   -lGL -lGLU -lopenal -lGLEW -lm -lglfw
-
-
 #
 # 'make depend' uses makedepend to automatically generate dependencies 
 #               (dependencies are added to end of Makefile)
@@ -59,7 +51,7 @@ MAIN = render_audio_openal
 .PHONY: depend clean
 
 all:    $(MAIN)
-	@echo  simple app to parse WAV file which is rendered using OpenAL
+	@echo  this will render a WAV file using OpenAL while displaying the audio time domain curve using OpenGL
 
 $(MAIN): $(OBJS) 
 	$(CC) $(CFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
